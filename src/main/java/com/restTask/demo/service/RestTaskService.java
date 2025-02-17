@@ -1,6 +1,8 @@
 package com.restTask.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.restTask.demo.entity.Datasets;
@@ -11,63 +13,40 @@ import java.util.*;
 @Service
 public class RestTaskService {
 
-    private final DataRepository dataRepository;
+	private final DataRepository dataRepository;
 
-    @Autowired
-    public RestTaskService(DataRepository dataRepository) {
-        this.dataRepository = dataRepository;
-    }
+	@Autowired
+	public RestTaskService(DataRepository dataRepository) {
+		this.dataRepository = dataRepository;
+	}
 
-   
-    public List<Datasets> getAllDatasets() {
-        return dataRepository.findAll();
-    }
+	public List<Datasets> getAllDatasets() {
+		return dataRepository.findAll();
+	}
 
-   
-    public Optional<Datasets> getDatasetById(String id) {
-        return dataRepository.findById(id);
-    }
+	public Optional<Datasets> getDatasetById(String id) {
+		return dataRepository.findById(id);
+	}
 
-    // Here i am inserting record 
-    public Datasets createDataset(Datasets dataset) {
-        try {
-            
-        	// Id is auto generated here 
-            if (dataset.getId() == null || dataset.getId().isBlank()) {
-                dataset.setId("RestTask-" + UUID.randomUUID().toString()); 
-            }
-            
-            if (dataset.getStatus() == null) {
-                throw new IllegalArgumentException("status is required");
-            }
+	// Here i am inserting record
+	public Datasets createDataset(Datasets dataset) {
 
+		try {
 
-            if (dataset.getDataSchema() == null) {
-                throw new IllegalArgumentException("dataSchema is required");
-            }
+			if (dataset.getCreatedBy() == null || dataset.getCreatedBy().isBlank()) {
+					dataset.setCreatedBy(System.getProperty("user.name"));
+			}
 
-            // Set routeConfig if not provided in postman req body ...
-            if (dataset.getRouteConfig() == null) {
-                Map<String, Object> routeConfig = new HashMap<>();
-                routeConfig.put("enabled", true);  
-                dataset.setRouteConfig(routeConfig);
-            }
+			if (dataset.getUpdatedBy() == null || dataset.getUpdatedBy().isBlank()) {
+				dataset.setUpdatedBy(System.getProperty("user.name"));
+			}
+			
+				dataset.setUpdatedAt(LocalDateTime.now());
+			// Save the dataset ( it can insert new record or update existing record )
+			return dataRepository.save(dataset);
 
-           
-            if (dataset.getCreatedBy() == null || dataset.getCreatedBy().isBlank()) {
-            	dataset.setCreatedBy(System.getProperty("user.name"));
-            }
-            
-            if (dataset.getUpdatedBy() == null || dataset.getUpdatedBy().isBlank()) {
-            	dataset.setUpdatedBy(System.getProperty("user.name"));
-            }
-            dataset.setUpdatedAt(LocalDateTime.now());
-
-            // Save the dataset ( it can insert new record or update existing record )
-            return dataRepository.save(dataset);
-            
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create dataset with system info", e);
-        }
-    }
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to create dataset with system info", e);
+		}
+	}
 }
