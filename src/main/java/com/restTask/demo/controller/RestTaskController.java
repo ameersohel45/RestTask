@@ -24,10 +24,10 @@ public class RestTaskController {
 	private final ObjectMapper objectMapper;
 	private final Validator validator;
 
-	public RestTaskController(RestTaskService restTaskService, ObjectMapper objectMapper,Validator validator) {
+	public RestTaskController(RestTaskService restTaskService, ObjectMapper objectMapper, Validator validator) {
 		this.restTaskService = restTaskService;
 		this.objectMapper = objectMapper;
-		this.validator=validator;
+		this.validator = validator;
 	}
 
 	// GET all datasets
@@ -63,37 +63,37 @@ public class RestTaskController {
 	// POST create dataset
 	@PostMapping("/create")
 	public ResponseEntity<Map<String, Object>> createDataset(@RequestBody String json) {
+
 		Map<String, Object> response = new HashMap<>();
 
 		try {
 			Datasets tempDataset = objectMapper.readValue(json, Datasets.class);
 			Optional<String> validationError = Validator.validate(tempDataset);
-			
-			
-            if (validationError.isPresent()) {
-                response.put("status", HttpStatus.BAD_REQUEST.value());
-                response.put("message", validationError.get());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
+
+			if (validationError.isPresent()) {
+				response.put("status", HttpStatus.BAD_REQUEST.value());
+				response.put("message", validationError.get());
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+			}
 
 			Datasets savedDataset = restTaskService.createDataset(tempDataset);
 			response.put("status", HttpStatus.CREATED.value());
 			response.put("message", "Dataset created successfully");
-            //response.put("data", savedDataset);
+			// response.put("data", savedDataset);
 			response.put("id", savedDataset.getId());
 			return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
-		}catch (InvalidFormatException e) {
-			
+		} catch (InvalidFormatException e) {
+
 			response.put("status", HttpStatus.BAD_REQUEST.value());
 			response.put("message", "Status should be Live or Draft or RETIRED");
 			
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-		} 
-		catch (Exception e) {
+			
+		} catch (Exception e) {
 			response.put("status", HttpStatus.BAD_REQUEST.value());
 			response.put("message", "check request body ");
-			
+
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
 	}

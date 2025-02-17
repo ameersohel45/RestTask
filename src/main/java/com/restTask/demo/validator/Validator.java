@@ -10,20 +10,42 @@ import com.restTask.demo.entity.Status;
 @Component
 public class Validator {
 
-    public static Optional<String> validate(Datasets dataset) {
-        if (dataset.getDataSchema() == null || dataset.getDataSchema().isEmpty()|| dataset.getDataSchema().values().isEmpty()) {
-            return Optional.of("dataSchema is required.");
-        }
-        if (dataset.getRouteConfig() == null || dataset.getRouteConfig().isEmpty() || dataset.getRouteConfig().values().isEmpty()){
-            return Optional.of("Route config key & values are needed.");
-        }
-        if (dataset.getStatus() == null || dataset.getStatus().toString().isBlank()) {
-            return Optional.of("Status is required.");
-        }
-        if (dataset.getId() == null || dataset.getId().isBlank()) {
-            return Optional.of("Id field is required.");
-        }
-        
-        return Optional.empty();
-    }
+	public static Optional<String> validate(Datasets dataset) {
+		
+		if (dataset.getDataSchema() == null || dataset.getDataSchema().isEmpty()
+				|| dataset.getDataSchema().values().isEmpty()) {
+			return Optional.of("dataSchema is required.");
+		}
+		
+		if (dataset.getRouteConfig() == null || dataset.getRouteConfig().isEmpty()
+				|| dataset.getRouteConfig().values().isEmpty()) {
+			return Optional.of("Route config key & values are needed.");
+		}
+		
+		if (dataset.getStatus() == null || dataset.getStatus().toString().isBlank()) {
+			return Optional.of("Status is required.");
+		}
+		
+		if (dataset.getId() == null || dataset.getId().isBlank()) {
+			return Optional.of("Id field is required.");
+		}
+		
+		if (dataset.getCreatedBy() == null) {
+			return Optional.of("CreatedBy field required in request body ");
+		}
+		
+		if (dataset.getUpdatedBy() == null) {
+			return Optional.of("UpdatedBy fileld required in request body");
+		}
+
+		if (dataset.getCreatedBy().matches(".*\\d.*") || dataset.getCreatedBy().isBlank()) {
+			return Optional.of("CreatedBy : should be name ");
+		}
+		
+		if (dataset.getUpdatedBy().matches(".*\\d.*") || dataset.getUpdatedBy().isBlank()) {
+			return Optional.of("UpdatedBy : should be name ");
+		}
+		
+		return Optional.empty();
+	}
 }

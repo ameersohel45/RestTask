@@ -33,15 +33,9 @@ public class RestTaskService {
 
 		try {
 
-			if (dataset.getCreatedBy() == null || dataset.getCreatedBy().isBlank()) {
-					dataset.setCreatedBy(System.getProperty("user.name"));
-			}
 
-			if (dataset.getUpdatedBy() == null || dataset.getUpdatedBy().isBlank()) {
-				dataset.setUpdatedBy(System.getProperty("user.name"));
-			}
-			
-				dataset.setUpdatedAt(LocalDateTime.now());
+			dataset.setCreatedAt(LocalDateTime.now());
+			dataset.setUpdatedAt(LocalDateTime.now());
 			// Save the dataset ( it can insert new record or update existing record )
 			return dataRepository.save(dataset);
 
