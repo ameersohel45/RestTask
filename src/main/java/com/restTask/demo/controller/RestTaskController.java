@@ -61,7 +61,7 @@ public class RestTaskController {
         Map<String, Object> response = new HashMap<>();
         try {
             Datasets tempDataset = objectMapper.readValue(json, Datasets.class);
-            Datasets savedDataset = restTaskService.createDatasetWithSystemInfo(tempDataset);
+            Datasets savedDataset = restTaskService.createDataset(tempDataset);
             response.put("status", HttpStatus.CREATED.value());
             response.put("message", "Dataset created successfully");
 //            response.put("data", savedDataset);
