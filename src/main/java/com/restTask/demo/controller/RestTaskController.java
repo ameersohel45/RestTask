@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.restTask.demo.entity.Datasets;
 import com.restTask.demo.entity.Status;
+import com.restTask.demo.repo.DataRepository;
 import com.restTask.demo.service.RestTaskService;
 import com.restTask.demo.validator.Validator;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,71 +32,31 @@ public class RestTaskController {
 		this.validator = validator;
 	}
 
-	// GET all datasets
 	@GetMapping("/get")
 	public ResponseEntity<Map<String, Object>> getDatasets() {
-		List<Datasets> datasets = restTaskService.getAllDatasets();
-		Map<String, Object> response = new HashMap<>();
-		response.put("status", HttpStatus.OK.value());
-		response.put("message", "Datasets retrieved successfully");
-		response.put("totalRecords", datasets.size());
-		response.put("data", datasets);
-		return ResponseEntity.ok(response);
+		return restTaskService.getAllDatasets();
 	}
 
-	// GET dataset by ID
 	@GetMapping("/get/{id}")
 	public ResponseEntity<Map<String, Object>> getDatasetById(@PathVariable String id) {
-		Optional<Datasets> dataset = restTaskService.getDatasetById(id);
-		Map<String, Object> response = new HashMap<>();
-
-		if (dataset.isPresent()) {
-			response.put("status", HttpStatus.OK.value());
-			response.put("message", "Dataset retrieved successfully");
-			response.put("data", dataset.get());
-			return ResponseEntity.ok(response);
-		} else {
-			response.put("status", HttpStatus.NOT_FOUND.value());
-			response.put("message", "Dataset not found for ID: " + id);
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-		}
+		return restTaskService.getDatasetById(id);	
 	}
 
-	// POST create dataset
 	@PostMapping("/create")
 	public ResponseEntity<Map<String, Object>> createDataset(@RequestBody String json) {
 
-		Map<String, Object> response = new HashMap<>();
-
-		try {
-			Datasets tempDataset = objectMapper.readValue(json, Datasets.class);
-			Optional<String> validationError = Validator.validate(tempDataset);
-
-			if (validationError.isPresent()) {
-				response.put("status", HttpStatus.BAD_REQUEST.value());
-				response.put("message", validationError.get());
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-			}
-
-			Datasets savedDataset = restTaskService.createDataset(tempDataset);
-			response.put("status", HttpStatus.CREATED.value());
-			response.put("message", "Dataset created successfully");
-			// response.put("data", savedDataset);
-			response.put("id", savedDataset.getId());
-			return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
-		} catch (InvalidFormatException e) {
-
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("message", "Status should be Live or Draft or RETIRED");
-			
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-			
-		} catch (Exception e) {
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("message", "check request body ");
-
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-		}
+		return restTaskService.createDataset(json);
 	}
+	@PutMapping("/update/{id}")
+	public ResponseEntity<Map<String, Object>> updateDataset(
+	        @PathVariable String id, @RequestBody String json) {
+	    return restTaskService.updateDataset(id, json);
+	}
+	
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<Map<String,Object>> deleteById(@PathVariable String id)
+	{
+		return restTaskService.delete(id);
+	}
+
 }
